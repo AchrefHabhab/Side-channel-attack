@@ -59,6 +59,29 @@ To apply side-channel techniques on an FPGA-based AES implementation using the C
 
 ---
 
+## 🔧 FPGA Bitstream Modifications
+
+To generate a proper trigger during AES encryption on the CW305 board, the original FPGA code was modified.
+
+### 🔹 Trigger Signal Implementation
+
+- A new signal (`EXTCLKOUT_T13`) was introduced inside the AES core to act as a trigger.
+- This signal goes **high** when the AES encryption begins and returns **low** when it finishes.
+
+### 🔹 Rerouting the Trigger to an Output Pin
+
+- The trigger signal was routed to **pin TP1** of the FPGA, which is connected to the **TP4 test point** on the CW305 board.
+- The `.xdc` constraints file was updated as follows:
+
+```tcl
+set_property PACKAGE_PIN TP1 [get_ports {EXTCLKOUT_TP1}]
+set_property IOSTANDARD LVCMOS33 [get_ports {EXTCLKOUT_TP1}]
+```
+We based our design on the official ChipWhisperer AES project for the CW305 board:  
+🔗 [https://github.com/newaetech/chipwhisperer/tree/develop/firmware/fpgas/aes/vivado/cw305_aes.runs/impl_100t](https://github.com/newaetech/chipwhisperer/tree/develop/firmware/fpgas/aes/vivado/cw305_aes.runs/impl_100t)
+
+---
+
 ## 🔧 Custom `encrypt` Functions
 
 To capture power traces directly from an external oscilloscope, we created two custom `encrypt` functions:
